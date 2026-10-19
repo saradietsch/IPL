@@ -28,4 +28,6 @@ ehthumbs.db
 Desktop.ini
 
 # Obecné
-*.log
+*.log.venv/
+.venv/
+a.exe
