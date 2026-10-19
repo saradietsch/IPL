@@ -1,8 +1,0 @@
-fun main() {
-  print (3.5);
-  print true;
-  print false;
-  print nil;
-  print "text";
-  42;
-}
