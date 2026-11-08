@@ -54,9 +54,13 @@ private:
     }
 
     if (auto *variable = std::get_if<VarStatement>(&statement.node)) {
-      // TODO WEEK04: declare, resolve the initializer, define, then return.
-      throw CompileError(Phase::Resolve, source_.name(), variable->name_span,
-                         "TODO WEEK04: resolve variable declaration");
+      // TODO: done
+
+      declare(*variable);
+      resolveExpression(variable->initializer);
+      define(variable->name);
+      return
+
     }
 
     if (auto *assignment =
@@ -76,8 +80,13 @@ private:
     if (auto *block = std::get_if<BlockStatement>(&statement.node)) {
       (void)block;
       // TODO WEEK04: begin scope, resolve the block's statements, end scope.
-      throw CompileError(Phase::Resolve, source_.name(), statement.span,
-                         "TODO WEEK04: implement block scope");
+      // done
+
+      beginScope();
+      resolveStatements(block->statements);
+      endScope();
+      return;
+      
     }
 
     throw CompileError(Phase::Resolve, source_.name(), statement.span,
