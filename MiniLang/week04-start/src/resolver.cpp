@@ -59,7 +59,7 @@ private:
       declare(*variable);
       resolveExpression(variable->initializer);
       define(variable->name);
-      return
+      return;
 
     }
 
@@ -94,16 +94,34 @@ private:
   }
 
   void declare(VarStatement &variable) {
-    (void)next_symbol_;
     // TODO WEEK04: insert an undefined binding; reject duplicates; record its ID.
-    throw CompileError(Phase::Resolve, source_.name(), variable.name_span,
-                       "TODO WEEK04: declare variable '" + variable.name + "'");
+    //done
+    auto &scope = scopes_.back();
+    const auto id = next_symbol_;
+    if (!scope.emplace(variable.name, Binding{id, false}).second) {
+      throw CompileError(Phase::Resolve, source_.name(), variable.name_span, "duplicate variable '" + variable.name + "' in the same scope");
+    }
+
+    variable.resolved_id = id;
+    ++next_symbol_;
   }
 
-  void define(const std::string &name) {
-    // TODO WEEK04: mark the existing current-scope binding as defined.
-    throw CompileError(Phase::Resolve, source_.name(),
-                       "TODO WEEK04: define variable '" + name + "'");
+  void define(const std::string &name) { scopes_.back().at(name).defined = true; }
+  // done
+  
+  SymbolId resolveName(const std::string &name, const SourceSpan span) const {
+    const auto &scope = scopes_.back();
+    const auto binding = scope.find(name);
+    if (binding == scope.end()) {
+      throw CompileError(Phase::Resolve, source_.name(), span,
+                         "unknown variable '" + name + "' in current scope");
+    }
+    if (!binding->second.defined) {
+      throw CompileError(Phase::Resolve, source_.name(), span,
+                         "cannot read variable '" + name +
+                             "' in its own initializer");
+    }
+    return binding->second.id;
   }
 
   SymbolId resolveName(const std::string &name, const SourceSpan span) const {
